@@ -1,6 +1,7 @@
 from app.models.transcript import Sentence
 from app.services.transcript_service import build_sentences
-
+import pytest
+@pytest.mark.unit
 
 def test_build_sentences(monkeypatch):
     fake_transcript = [

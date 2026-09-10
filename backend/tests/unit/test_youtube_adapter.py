@@ -1,5 +1,6 @@
 from app.adapters.youtube_adapter import fetch_transcript
-
+import pytest
+@pytest.mark.unit
 
 def test_fetch_transcript(monkeypatch):
     fake_transcript = [
