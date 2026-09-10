@@ -3,6 +3,6 @@ import pytest
 
 @pytest.mark.integration 
 def test_fetch_transcript():
-    video_id = "M7lemjPlHkc"
+    video_id = "uVGV8LG3HHM"
     result = fetch_transcript(video_id)
     assert result is not None
