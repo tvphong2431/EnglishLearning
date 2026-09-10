@@ -33,3 +33,7 @@ def test_build_sentences(monkeypatch):
     assert result[0].text == "Hello"
     assert result[0].start == 0.0
     assert result[0].duration == 2.5
+
+    assert result[1].text == "World"
+    assert result[1].start == 2.5
+    assert result[1].duration == 1.5
