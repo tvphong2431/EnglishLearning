@@ -5,4 +5,4 @@ def fetch_transcript(video_id: str):
     api = YouTubeTranscriptApi()
     transcript = api.fetch(video_id)
 
-    return transcript
+    return transcript.to_raw_data()
