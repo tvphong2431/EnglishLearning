@@ -1,14 +1,9 @@
-def test_settings_loads_environment_variables(monkeypatch):
-    monkeypatch.setenv(
-        "DENO_PATH",
-        r"C:\Users\Nelsonn\.deno\bin\deno.exe",
-    )
-    monkeypatch.setenv(
-        "POT_SERVER_URL",
-        "http://127.0.0.1:4416",
-    )
+import os
+from dotenv import load_dotenv
 
-    settings = Settings()
+load_dotenv() # read .env and load all into os.environ
 
-    assert settings.deno_path == r"C:\Users\Nelsonn\.deno\bin\deno.exe"
-    assert settings.pot_server_url == "http://127.0.0.1:4416"
+class Settings:
+    def __init__(self):
+        self.deno_path = os.environ["DENO_PATH"]
+        self.pot_server_url = os.environ["POT_SERVER_URL"]
