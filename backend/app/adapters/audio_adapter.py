@@ -1,6 +1,9 @@
 from pathlib import Path
 from yt_dlp import YoutubeDL
+from app.config.settings import Settings
 def _download_from_youtube(video_id: str, output_path: Path) -> Path:
+    settings = Settings()
+
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     options = {
@@ -12,6 +15,14 @@ def _download_from_youtube(video_id: str, output_path: Path) -> Path:
                 "preferredcodec": "mp3",
             }
         ],
+        "js_runtimes": {
+            "deno": settings.deno_path,
+        },
+        "extractor_args": {
+            "youtubepot-bgutilhttp": {
+                "base_url": settings.pot_server_url,
+            },
+        },
     }
 
     with YoutubeDL(options) as ydl:
