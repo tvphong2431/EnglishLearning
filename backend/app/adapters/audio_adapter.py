@@ -16,11 +16,16 @@ def _download_from_youtube(video_id: str, output_path: Path) -> Path:
             }
         ],
         "js_runtimes": {
-            "deno": settings.deno_path,
+            "deno": {
+                "path": settings.deno_path,
+            },
         },
         "extractor_args": {
             "youtubepot-bgutilhttp": {
                 "base_url": settings.pot_server_url,
+            },
+            "youtube": {
+                "player_client": ["mweb"],
             },
         },
     }
@@ -28,8 +33,8 @@ def _download_from_youtube(video_id: str, output_path: Path) -> Path:
     with YoutubeDL(options) as ydl:
         ydl.download([url])
 
-    return output_path
+    return Path(f"{output_path}.mp3")
 
 def download_audio(video_id: str) -> Path:
-    output_path = Path(f"{video_id}.mp3")
+    output_path = Path(video_id)
     return _download_from_youtube(video_id, output_path)

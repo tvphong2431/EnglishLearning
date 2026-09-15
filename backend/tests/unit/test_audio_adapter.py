@@ -9,6 +9,7 @@ def test_download_audio_returns_audio_path(monkeypatch, tmp_path):
 
     def fake_downloader(video_id, output_path):
         assert video_id == "abc123"
+        assert output_path == Path("abc123")
         return fake_audio
 
     monkeypatch.setattr(
@@ -41,8 +42,6 @@ def test_download_from_youtube(monkeypatch, tmp_path):
         FakeYoutubeDL,
     )
 
-    output_path = tmp_path / "abc123.mp3"
-
     class FakeSettings:
         deno_path = r"C:\fake\deno.exe"
         pot_server_url = "http://fake-pot-server:4416"
@@ -53,7 +52,7 @@ def test_download_from_youtube(monkeypatch, tmp_path):
         FakeSettings,
     )
 
-    output_path = tmp_path / "abc123.mp3"
+    output_path = tmp_path / "abc123"
 
 
     result = _download_from_youtube(
@@ -61,7 +60,7 @@ def test_download_from_youtube(monkeypatch, tmp_path):
         output_path,
     )
 
-    assert result == output_path
+    assert result == Path(f"{output_path}.mp3")
 
     options = calls[0][1]
 
@@ -75,12 +74,17 @@ def test_download_from_youtube(monkeypatch, tmp_path):
     ]
 
     assert options["js_runtimes"] == {
-        "deno": r"C:\fake\deno.exe",
+        "deno": {
+            "path": r"C:\fake\deno.exe",
+        },
     }
 
     assert options["extractor_args"] == {
         "youtubepot-bgutilhttp": {
             "base_url": "http://fake-pot-server:4416",
+        },
+        "youtube": {
+            "player_client": ["mweb"],
         },
     }
 
