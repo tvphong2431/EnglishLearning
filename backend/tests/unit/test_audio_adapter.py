@@ -1,7 +1,9 @@
 from pathlib import Path
 from app.adapters.audio_adapter import _download_from_youtube
 from app.adapters.audio_adapter import download_audio
-
+from app.errors import AppError
+from yt_dlp.utils import DownloadError
+import pytest
 
 def test_download_audio_returns_audio_path(monkeypatch, tmp_path):
     fake_audio = tmp_path / "abc123.mp3"
@@ -93,3 +95,31 @@ def test_download_from_youtube(monkeypatch, tmp_path):
         "download",
         ["https://www.youtube.com/watch?v=abc123"],
     )
+
+def test_download_from_youtube_raises_app_error(monkeypatch, tmp_path):
+    class FakeYoutubeDL:
+        def __init__(self, options):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def download(self, urls):
+            raise DownloadError("YouTube download failed")
+
+    monkeypatch.setattr(
+        "app.adapters.audio_adapter.YoutubeDL",
+        FakeYoutubeDL,
+    )
+
+    output_path = tmp_path / "abc123"
+
+    with pytest.raises(AppError) as exc_info:
+        _download_from_youtube("abc123", output_path)
+
+    assert exc_info.value.code == "AUDIO_DOWNLOAD_FAILED"
+    assert exc_info.value.message == "Failed to download audio."
+    assert exc_info.value.status_code == 500

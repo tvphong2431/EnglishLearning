@@ -1,6 +1,8 @@
 from pathlib import Path
 from yt_dlp import YoutubeDL
 from app.config.settings import Settings
+from app.errors import AppError
+from yt_dlp.utils import DownloadError
 def _download_from_youtube(video_id: str, output_path: Path) -> Path:
     settings = Settings()
 
@@ -29,9 +31,15 @@ def _download_from_youtube(video_id: str, output_path: Path) -> Path:
             },
         },
     }
-
-    with YoutubeDL(options) as ydl:
-        ydl.download([url])
+    try:
+        with YoutubeDL(options) as ydl:
+            ydl.download([url])
+    except DownloadError as exc:
+        raise AppError(
+            "AUDIO_DOWNLOAD_FAILED",
+            "Failed to download audio.",
+            500,
+        ) from exc 
 
     return Path(f"{output_path}.mp3")
 
