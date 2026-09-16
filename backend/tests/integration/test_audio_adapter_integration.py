@@ -12,3 +12,4 @@ def test_download_audio():
 
     assert result.exists()
     assert result.suffix == ".mp3"
+    assert result.stat().st_size > 0
