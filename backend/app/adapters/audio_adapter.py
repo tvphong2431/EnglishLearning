@@ -44,5 +44,6 @@ def _download_from_youtube(video_id: str, output_path: Path) -> Path:
     return Path(f"{output_path}.mp3")
 
 def download_audio(video_id: str) -> Path:
-    output_path = Path(video_id)
+    output_path = Path("temp") / video_id
+
     return _download_from_youtube(video_id, output_path)

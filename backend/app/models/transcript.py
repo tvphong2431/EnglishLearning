@@ -6,3 +6,4 @@ class Sentence:
     text: str
     start: float
     duration: float
+    word_count: int

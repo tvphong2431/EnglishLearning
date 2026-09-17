@@ -1,5 +1,11 @@
 from youtube_transcript_api import YouTubeTranscriptApi
-from youtube_transcript_api._errors import IpBlocked, VideoUnavailable, TranscriptsDisabled, NoTranscriptFound
+from youtube_transcript_api._errors import (
+    IpBlocked,
+    NoTranscriptFound,
+    TranscriptsDisabled,
+    VideoUnavailable,
+    RequestBlocked,
+)
 
 from app.errors import AppError
 
@@ -10,7 +16,7 @@ def fetch_transcript(video_id: str):
     try:
         transcript = api.fetch(video_id)
 
-    except IpBlocked:
+    except (IpBlocked, RequestBlocked):
         raise AppError(
             code="YOUTUBE_ACCESS_BLOCKED",
             message="YouTube access is temporarily blocked.",
