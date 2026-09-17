@@ -38,7 +38,6 @@ def test_create_session():
     assert session.video_id == "abc123"
     assert session.sentences == sentences
 
-
 @pytest.mark.unit
 def test_get_session_returns_none_when_not_found():
     sessions.clear()
@@ -81,6 +80,7 @@ def test_create_dictation_session(monkeypatch):
     assert session.sentences == fake_sentences
     assert session_service.get_session(session_id) == session
 
+@pytest.mark.unit
 def test_check_answer_returns_true_for_matching_answer():
     session_service.sessions.clear()
 
@@ -175,3 +175,107 @@ def test_check_answer_raises_app_error_when_sentence_id_is_negative():
 
     assert exc_info.value.code == "SENTENCE_NOT_FOUND"
     assert exc_info.value.status_code == 404
+
+@pytest.mark.unit
+def test_check_answer_ignores_letter_case():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=0.0,
+            duration=1.0,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    result = session_service.check_answer(
+        session_id=session_id,
+        sentence_id=0,
+        answer="you ready?",
+    )
+
+    assert result is True
+
+@pytest.mark.unit
+def test_check_answer_ignores_punctuation():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=0.0,
+            duration=1.0,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    result = session_service.check_answer(
+        session_id=session_id,
+        sentence_id=0,
+        answer="you ready",
+    )
+
+    assert result is True
+
+@pytest.mark.unit
+def test_check_answer_ignores_extra_whitespace():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=0.0,
+            duration=1.0,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    result = session_service.check_answer(
+        session_id=session_id,
+        sentence_id=0,
+        answer="  YOU   READY  ",
+    )
+
+    assert result is True
+
+@pytest.mark.unit
+def test_check_answer_returns_false_for_wrong_answer():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=0.0,
+            duration=1.0,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    result = session_service.check_answer(
+        session_id=session_id,
+        sentence_id=0,
+        answer="you are ready",
+    )
+
+    assert result is False

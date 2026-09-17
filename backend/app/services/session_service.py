@@ -5,7 +5,7 @@ from app.models.session import Session
 from app.services.transcript_service import build_sentences
 from app.services.youtube_service import extract_youtube_video_id
 from app.errors import AppError
-
+import string
 
 sessions: dict[str, Session] = {}
 
@@ -35,6 +35,15 @@ def create_dictation_session(youtube_url: str) -> tuple[str, Session]:
 
     return session_id, sessions[session_id]
 
+def normalize_answer(text: str) -> str:
+    text = text.lower()
+
+    text = text.translate(
+        str.maketrans("", "", string.punctuation)
+    )
+
+    return " ".join(text.split())
+
 def check_answer(session_id: str, sentence_id: int, answer: str,) -> bool:
     session = get_session(session_id)
 
@@ -52,4 +61,4 @@ def check_answer(session_id: str, sentence_id: int, answer: str,) -> bool:
         )
     sentence = session.sentences[sentence_id]
 
-    return answer == sentence.text
+    return normalize_answer(answer) == normalize_answer(sentence.text)
