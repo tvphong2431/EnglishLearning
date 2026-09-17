@@ -1,14 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.api.process import router as process_router
 from app.api.session import router as session_router
 from app.errors import AppError
 
 
 app = FastAPI()
-
-app.include_router(process_router)
 app.include_router(session_router)
 
 
