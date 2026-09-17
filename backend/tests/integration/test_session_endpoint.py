@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.models.transcript import Sentence
-from app.services import transcript_service
+from app.services import session_service
 from app.services.session_service import (
     sessions, create_session
 )
@@ -26,7 +26,7 @@ def test_create_session_endpoint(monkeypatch):
         ]
 
     monkeypatch.setattr(
-        transcript_service,
+        session_service,
         "build_sentences",
         fake_build_sentences,
     )
