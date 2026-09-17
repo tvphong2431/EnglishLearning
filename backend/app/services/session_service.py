@@ -2,6 +2,8 @@ from uuid import uuid4
 
 from app.models.transcript import Sentence
 from app.models.session import Session
+from app.services.transcript_service import build_sentences
+from app.services.youtube_service import extract_youtube_video_id
 
 
 sessions: dict[str, Session] = {}
@@ -17,5 +19,24 @@ def create_session(video_id: str, sentences: list[Sentence]) -> str:
 
     return session_id
 
-def get_session(session_id: str) -> dict | None:
+def get_session(session_id: str) -> Session | None:
     return sessions.get(session_id)
+
+def create_dictation_session(youtube_url: str) -> tuple[str, Session]:
+    video_id = extract_youtube_video_id(youtube_url)
+
+    sentences = build_sentences(video_id)
+
+    session_id = create_session(
+        video_id=video_id,
+        sentences=sentences,
+    )
+
+    return session_id, sessions[session_id]
+
+def check_answer(session_id: str, sentence_id: int, answer: str,) -> bool:
+    session = get_session(session_id)
+
+    sentence = session.sentences[sentence_id]
+
+    return answer == sentence.text
