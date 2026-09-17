@@ -12,3 +12,4 @@ def test_sentence_model():
     assert sentence.text == "Hello"
     assert sentence.start == 0.0
     assert sentence.duration == 2.5
+    assert sentence.word_count == 1
