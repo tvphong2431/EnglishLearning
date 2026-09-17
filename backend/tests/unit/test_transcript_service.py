@@ -3,45 +3,10 @@ from pathlib import Path
 from app.services.transcript_service import (
     build_sentences,
     build_sentences_from_whisper,
+    build_text_sentences_from_youtube,
 )
 from app.errors import AppError
 import pytest
-# @pytest.mark.unit
-
-# def test_build_sentences(monkeypatch):
-#     fake_transcript = [
-#         {
-#             "text": "Hello",
-#             "start": 0.0,
-#             "duration": 2.5,
-#         },
-#         {
-#             "text": "World",
-#             "start": 2.5,
-#             "duration": 1.5,
-#         },
-#     ]
-
-#     def fake_fetch_transcript(video_id):
-#         return fake_transcript
-
-#     monkeypatch.setattr(
-#         "app.services.transcript_service.fetch_transcript",
-#         fake_fetch_transcript,
-#     )
-
-#     result = build_sentences("abc123")
-
-#     assert len(result) == 2
-#     assert isinstance(result[0], Sentence)
-
-#     assert result[0].text == "Hello"
-#     assert result[0].start == 0.0
-#     assert result[0].duration == 2.5
-
-#     assert result[1].text == "World"
-#     assert result[1].start == 2.5
-#     assert result[1].duration == 1.5
 
 @pytest.mark.unit
 def test_build_sentences_from_whisper():
@@ -120,7 +85,6 @@ def test_build_sentences_uses_youtube_transcript(monkeypatch):
     assert result[0].start == 0.0
     assert result[0].duration == 1.5
 
-
 @pytest.mark.unit
 def test_build_sentences_fallback_when_transcript_not_found(monkeypatch):
     def fake_fetch_transcript(video_id):
@@ -174,7 +138,6 @@ def test_build_sentences_fallback_when_transcript_not_found(monkeypatch):
     assert result[0].text == "Hello world."
     assert result[0].start == 0.0
     assert result[0].duration == 1.0
-
 
 @pytest.mark.unit
 def test_build_sentences_fallback_when_transcript_disabled(monkeypatch):
@@ -230,7 +193,6 @@ def test_build_sentences_fallback_when_transcript_disabled(monkeypatch):
     assert result[0].start == 2.0
     assert result[0].duration == pytest.approx(0.8)
 
-
 @pytest.mark.unit
 def test_build_sentences_does_not_fallback_for_video_unavailable(monkeypatch):
     def fake_fetch_transcript(video_id):
@@ -250,3 +212,30 @@ def test_build_sentences_does_not_fallback_for_video_unavailable(monkeypatch):
 
     assert exc_info.value.code == "VIDEO_UNAVAILABLE"
     assert exc_info.value.status_code == 404
+
+@pytest.mark.unit
+def test_build_text_sentences_from_youtube():
+    transcript = [
+        {
+            "text": "Hey everybody, welcome to this A1",
+            "start": 0.4,
+            "duration": 5.04,
+        },
+        {
+            "text": "English listening practice video. You",
+            "start": 2.8,
+            "duration": 4.479,
+        },
+        {
+            "text": "can use this video to train your listening.",
+            "start": 5.04,
+            "duration": 4.0,
+        },
+    ]
+
+    result = build_text_sentences_from_youtube(transcript)
+
+    assert result == [
+        "Hey everybody, welcome to this A1 English listening practice video.",
+        "You can use this video to train your listening.",
+    ]
