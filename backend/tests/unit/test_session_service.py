@@ -6,7 +6,7 @@ from app.services.session_service import (
     get_session,
     sessions,
 )
-
+from app.models.session import Session
 
 @pytest.mark.unit
 def test_create_session():
@@ -29,9 +29,11 @@ def test_create_session():
     session = get_session(session_id)
 
     assert isinstance(session_id, str)
+    assert isinstance(session, Session)
+    
     assert session is not None
-    assert session["video_id"] == "abc123"
-    assert session["sentences"] == sentences
+    assert session.video_id == "abc123"
+    assert session.sentences == sentences
 
 
 @pytest.mark.unit
