@@ -6,6 +6,7 @@ def test_sentence_model():
         text="Hello",
         start=0.0,
         duration=2.5,
+        word_count=1
     )
 
     assert sentence.text == "Hello"

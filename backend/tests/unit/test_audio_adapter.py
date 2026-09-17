@@ -11,7 +11,7 @@ def test_download_audio_returns_audio_path(monkeypatch, tmp_path):
 
     def fake_downloader(video_id, output_path):
         assert video_id == "abc123"
-        assert output_path == Path("abc123")
+        assert output_path == Path("temp") / "abc123"
         return fake_audio
 
     monkeypatch.setattr(

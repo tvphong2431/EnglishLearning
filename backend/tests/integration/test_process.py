@@ -12,6 +12,7 @@ def test_process(monkeypatch):
                 text="Hello",
                 start=0.0,
                 duration=2.5,
+                word_count=1,
             )
         ]
 

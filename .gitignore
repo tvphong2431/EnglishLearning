@@ -10,3 +10,11 @@ __pycache__/
 
 # Environment
 .env
+
+# Skip all files inside temp
+temp/*
+
+# Git tracked
+!temp/.gitkeep 
+
+.worktrees/
