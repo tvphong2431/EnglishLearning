@@ -9,6 +9,7 @@ from app.services.session_service import (
 
 from app.services import session_service
 from app.models.session import Session
+from app.errors import AppError
 
 @pytest.mark.unit
 def test_create_session():
@@ -104,3 +105,73 @@ def test_check_answer_returns_true_for_matching_answer():
     )
 
     assert result is True
+
+@pytest.mark.unit
+def test_check_answer_raises_app_error_when_session_not_found():
+    session_service.sessions.clear()
+
+    with pytest.raises(AppError) as exc_info:
+        session_service.check_answer(
+            session_id="missing-session-id",
+            sentence_id=0,
+            answer="Hello",
+        )
+
+    assert exc_info.value.code == "SESSION_NOT_FOUND"
+    assert exc_info.value.status_code == 404
+
+@pytest.mark.unit
+def test_check_answer_raises_app_error_when_sentence_not_found():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="Hello",
+            start=0.0,
+            duration=1.0,
+            word_count=1,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    with pytest.raises(AppError) as exc_info:
+        session_service.check_answer(
+            session_id=session_id,
+            sentence_id=99,
+            answer="Hello",
+        )
+
+    assert exc_info.value.code == "SENTENCE_NOT_FOUND"
+    assert exc_info.value.status_code == 404
+
+@pytest.mark.unit
+def test_check_answer_raises_app_error_when_sentence_id_is_negative():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="Hello",
+            start=0.0,
+            duration=1.0,
+            word_count=1,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    with pytest.raises(AppError) as exc_info:
+        session_service.check_answer(
+            session_id=session_id,
+            sentence_id=-1,
+            answer="Hello",
+        )
+
+    assert exc_info.value.code == "SENTENCE_NOT_FOUND"
+    assert exc_info.value.status_code == 404

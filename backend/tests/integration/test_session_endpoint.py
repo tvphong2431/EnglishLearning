@@ -91,3 +91,41 @@ def test_check_answer_returns_true_when_correct():
     assert response_body == {
         "correct": True,
     }  
+
+@pytest.mark.integration
+def test_check_answer_returns_404_when_session_not_found():
+    session_service.sessions.clear()
+
+    response = client.post(
+        "/sessions/missing-session-id/check",
+        json={
+            "sentence_id": 0,
+            "answer": "Hello",
+        },
+    )
+
+    assert response.status_code == 404
+
+    assert response.json() == {
+        "code": "SESSION_NOT_FOUND",
+        "message": "Session not found.",
+    }
+
+@pytest.mark.integration
+def test_check_answer_returns_404_when_session_not_found():
+    session_service.sessions.clear()
+
+    response = client.post(
+        "/sessions/missing-session-id/check",
+        json={
+            "sentence_id": 0,
+            "answer": "Hello",
+        },
+    )
+
+    assert response.status_code == 404
+
+    assert response.json() == {
+        "code": "SESSION_NOT_FOUND",
+        "message": "Session not found.",
+    }

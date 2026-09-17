@@ -4,6 +4,7 @@ from app.models.transcript import Sentence
 from app.models.session import Session
 from app.services.transcript_service import build_sentences
 from app.services.youtube_service import extract_youtube_video_id
+from app.errors import AppError
 
 
 sessions: dict[str, Session] = {}
@@ -37,6 +38,18 @@ def create_dictation_session(youtube_url: str) -> tuple[str, Session]:
 def check_answer(session_id: str, sentence_id: int, answer: str,) -> bool:
     session = get_session(session_id)
 
+    if session is None:
+        raise AppError(
+            "SESSION_NOT_FOUND",
+            "Session not found.",
+            404,
+        )
+    if sentence_id < 0 or sentence_id >= len(session.sentences):
+        raise AppError(
+            "SENTENCE_NOT_FOUND",
+            "Sentence not found.",
+            404,
+        )
     sentence = session.sentences[sentence_id]
 
     return answer == sentence.text
