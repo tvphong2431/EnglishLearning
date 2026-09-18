@@ -23,3 +23,6 @@ class CheckAnswerRequest(BaseModel):
 
 class CheckAnswerResponse(BaseModel):
     correct: bool
+
+class ShowAnswerResponse(BaseModel):
+    answer: str

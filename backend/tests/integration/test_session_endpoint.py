@@ -129,3 +129,74 @@ def test_check_answer_returns_404_when_session_not_found():
         "code": "SESSION_NOT_FOUND",
         "message": "Session not found.",
     }
+
+# Showing answer
+def test_get_answer_endpoint_returns_sentence_text():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=10.26,
+            duration=0.44,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    response = client.get(
+        f"/sessions/{session_id}/sentences/0/answer"
+    )
+
+    assert response.status_code == 200
+
+    assert response.json() == {
+        "answer": "You ready?",
+    }
+
+def test_get_answer_returns_404_when_session_not_found():
+    session_service.sessions.clear()
+
+    response = client.get(
+        "/sessions/missing-session-id/sentences/0/answer"
+    )
+
+    assert response.status_code == 404
+
+    assert response.json() == {
+        "code": "SESSION_NOT_FOUND",
+        "message": "Session not found.",
+    }
+
+
+def test_get_answer_returns_404_when_sentence_not_found():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=10.26,
+            duration=0.44,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    response = client.get(
+        f"/sessions/{session_id}/sentences/99/answer"
+    )
+
+    assert response.status_code == 404
+
+    assert response.json() == {
+        "code": "SENTENCE_NOT_FOUND",
+        "message": "Sentence not found.",
+    }

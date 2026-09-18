@@ -6,13 +6,14 @@ from app.schemas.session import (
     SentenceInfo,
     CheckAnswerRequest,
     CheckAnswerResponse,
+    ShowAnswerResponse
 )
 from app.services import session_service
 
 
 router = APIRouter()
 
-
+#
 @router.post(
     "/sessions",
     response_model=CreateSessionResponse,
@@ -38,7 +39,7 @@ def create_dictation_session(request: CreateSessionRequest):
         sentences=sentence_infos,
     )
 
-
+# Check answer
 @router.post(
     "/sessions/{session_id}/check",
     response_model=CheckAnswerResponse,
@@ -52,4 +53,22 @@ def check_answer(session_id: str, request: CheckAnswerRequest):
 
     return CheckAnswerResponse(
         correct=correct,
+    )
+
+# Show answer
+@router.get(
+    "/sessions/{session_id}/sentences/{sentence_id}/answer",
+    response_model=ShowAnswerResponse,
+)
+def get_answer(
+    session_id: str,
+    sentence_id: int,
+):
+    answer = session_service.get_answer(
+        session_id=session_id,
+        sentence_id=sentence_id,
+    )
+
+    return ShowAnswerResponse(
+        answer=answer,
     )

@@ -80,6 +80,7 @@ def test_create_dictation_session(monkeypatch):
     assert session.sentences == fake_sentences
     assert session_service.get_session(session_id) == session
 
+# Test for checking answer
 @pytest.mark.unit
 def test_check_answer_returns_true_for_matching_answer():
     session_service.sessions.clear()
@@ -279,3 +280,97 @@ def test_check_answer_returns_false_for_wrong_answer():
     )
 
     assert result is False
+
+# Test for showing answer 
+@pytest.mark.unit
+def test_get_answer_returns_sentence_text():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=10.26,
+            duration=0.44,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    answer = session_service.get_answer(
+        session_id=session_id,
+        sentence_id=0,
+    )
+
+    assert answer == "You ready?"
+
+@pytest.mark.unit
+def test_get_answer_raises_app_error_when_session_not_found():
+    session_service.sessions.clear()
+
+    with pytest.raises(AppError) as exc_info:
+        session_service.get_answer(
+            session_id="missing-session-id",
+            sentence_id=0,
+        )
+
+    assert exc_info.value.code == "SESSION_NOT_FOUND"
+    assert exc_info.value.status_code == 404
+
+
+@pytest.mark.unit
+def test_get_answer_raises_app_error_when_sentence_not_found():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=10.26,
+            duration=0.44,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    with pytest.raises(AppError) as exc_info:
+        session_service.get_answer(
+            session_id=session_id,
+            sentence_id=99,
+        )
+
+    assert exc_info.value.code == "SENTENCE_NOT_FOUND"
+    assert exc_info.value.status_code == 404
+
+@pytest.mark.unit
+def test_get_answer_raises_app_error_when_sentence_id_is_negative():
+    session_service.sessions.clear()
+
+    sentences = [
+        Sentence(
+            text="You ready?",
+            start=10.26,
+            duration=0.44,
+            word_count=2,
+        )
+    ]
+
+    session_id = session_service.create_session(
+        video_id="abc123",
+        sentences=sentences,
+    )
+
+    with pytest.raises(AppError) as exc_info:
+        session_service.get_answer(
+            session_id=session_id,
+            sentence_id=-1,
+        )
+
+    assert exc_info.value.code == "SENTENCE_NOT_FOUND"
+    assert exc_info.value.status_code == 404

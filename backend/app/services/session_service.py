@@ -44,7 +44,10 @@ def normalize_answer(text: str) -> str:
 
     return " ".join(text.split())
 
-def check_answer(session_id: str, sentence_id: int, answer: str,) -> bool:
+def _get_sentence(
+    session_id: str,
+    sentence_id: int,
+) -> Sentence:
     session = get_session(session_id)
 
     if session is None:
@@ -53,12 +56,32 @@ def check_answer(session_id: str, sentence_id: int, answer: str,) -> bool:
             "Session not found.",
             404,
         )
+
     if sentence_id < 0 or sentence_id >= len(session.sentences):
         raise AppError(
             "SENTENCE_NOT_FOUND",
             "Sentence not found.",
             404,
         )
-    sentence = session.sentences[sentence_id]
+
+    return session.sentences[sentence_id]
+
+def check_answer(session_id: str, sentence_id: int, answer: str) -> bool:
+    session = get_session(session_id)
+
+    sentence = _get_sentence(
+        session_id=session_id,
+        sentence_id=sentence_id,
+    )
 
     return normalize_answer(answer) == normalize_answer(sentence.text)
+
+def get_answer(session_id: str, sentence_id: int) -> str:
+    session = get_session(session_id)
+
+    sentence = _get_sentence(
+        session_id=session_id,
+        sentence_id=sentence_id,
+    )
+
+    return sentence.text    
