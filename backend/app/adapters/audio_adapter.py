@@ -24,13 +24,16 @@ def _download_from_youtube(video_id: str, output_path: Path) -> Path:
         },
         "extractor_args": {
             "youtubepot-bgutilhttp": {
-                "base_url": settings.pot_server_url,
+                "base_url": [settings.pot_server_url],
             },
             "youtube": {
                 "player_client": ["mweb"],
             },
         },
     }
+
+    print("Extractor args:", options["extractor_args"], flush=True)
+
     try:
         with YoutubeDL(options) as ydl:
             ydl.download([url])

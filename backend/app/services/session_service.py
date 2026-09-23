@@ -28,10 +28,14 @@ def create_dictation_session(youtube_url: str) -> tuple[str, Session]:
 
     sentences = build_sentences(video_id)
 
+    print("build_sentences returned", flush=True)
+    
     session_id = create_session(
         video_id=video_id,
         sentences=sentences,
     )
+
+    print("Session created", flush=True)
 
     return session_id, sessions[session_id]
 
@@ -44,10 +48,7 @@ def normalize_answer(text: str) -> str:
 
     return " ".join(text.split())
 
-def _get_sentence(
-    session_id: str,
-    sentence_id: int,
-) -> Sentence:
+def _get_sentence(session_id: str, sentence_id: int) -> Sentence:
     session = get_session(session_id)
 
     if session is None:
@@ -67,8 +68,6 @@ def _get_sentence(
     return session.sentences[sentence_id]
 
 def check_answer(session_id: str, sentence_id: int, answer: str) -> bool:
-    session = get_session(session_id)
-
     sentence = _get_sentence(
         session_id=session_id,
         sentence_id=sentence_id,
@@ -77,8 +76,6 @@ def check_answer(session_id: str, sentence_id: int, answer: str) -> bool:
     return normalize_answer(answer) == normalize_answer(sentence.text)
 
 def get_answer(session_id: str, sentence_id: int) -> str:
-    session = get_session(session_id)
-
     sentence = _get_sentence(
         session_id=session_id,
         sentence_id=sentence_id,

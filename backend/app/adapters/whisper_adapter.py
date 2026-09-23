@@ -19,6 +19,7 @@ def transcribe_audio(audio_path: str):
     result = model.transcribe(
         str(audio_path),
         word_timestamps=True,
+        verbose=True,
     )
 
     return result

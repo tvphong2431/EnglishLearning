@@ -83,7 +83,9 @@ def test_download_from_youtube(monkeypatch, tmp_path):
 
     assert options["extractor_args"] == {
         "youtubepot-bgutilhttp": {
-            "base_url": "http://fake-pot-server:4416",
+            "base_url": [
+                "http://fake-pot-server:4416",
+            ],
         },
         "youtube": {
             "player_client": ["mweb"],
