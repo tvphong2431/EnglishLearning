@@ -8,7 +8,7 @@ def get_model():
     global _model
 
     if _model is None:
-        _model = whisper.load_model("base.en")
+        _model = whisper.load_model("base.en", device="cuda")
 
     return _model
 
