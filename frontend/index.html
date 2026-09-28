@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning</title>
+</head>
+
+<body>
+
+    <h1>Dictation Practice</h1>
+
+    <div>
+        <input 
+            id="youtube-url"
+            type="text"
+            placeholder="Enter YouTube URL"
+            size="50"
+        >
+
+        <button id="start-dictation-btn">
+            Start Session
+        </button>
+    </div>
+
+
+    <hr>
+
+
+    <h2>Session Information</h2>
+    <p id="session-info"> No session created.</p>
+
+
+    <h2>Video</h2>
+    <div id="player"></div>
+
+
+    <h2>Sentences</h2>
+    <ul id="sentence-list"> </ul>
+
+
+    <h2>Answer</h2>
+
+    <div>
+        <input
+            id="answer-input"
+            type="text"
+            placeholder="Type what you hear"
+            size="50"
+        >
+
+        <button id="check-answer-btn">
+            Check Answer
+        </button>
+    </div>
+
+    <p id="answer-result"></p>
+
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

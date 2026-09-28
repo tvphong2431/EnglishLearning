@@ -8,7 +8,7 @@ def get_model():
     global _model
 
     if _model is None:
-        _model = whisper.load_model("base.en")
+        _model = whisper.load_model("base.en", device="cuda")
 
     return _model
 
@@ -19,6 +19,7 @@ def transcribe_audio(audio_path: str):
     result = model.transcribe(
         str(audio_path),
         word_timestamps=True,
+        verbose=True,
     )
 
     return result

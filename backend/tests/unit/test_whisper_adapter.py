@@ -4,7 +4,7 @@ from app.adapters.whisper_adapter import transcribe_audio
 
 
 class FakeModel:
-    def transcribe(self, audio_path, word_timestamps):
+    def transcribe(self, audio_path, **kwargs):
         return {
             "text": "Hello world.",
             "segments": [],
@@ -25,16 +25,10 @@ def test_transcribe_audio(monkeypatch):
 
     assert result["text"] == "Hello world."
 
+
 @pytest.mark.unit
 def test_whisper_model_is_loaded_once(monkeypatch):
     load_count = 0
-
-    class FakeModel:
-        def transcribe(self, audio_path, word_timestamps):
-            return {
-                "text": "Hello",
-                "segments": [],
-            }
 
     def fake_load_model(model_name):
         nonlocal load_count

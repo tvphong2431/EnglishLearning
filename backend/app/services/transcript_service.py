@@ -1,54 +1,22 @@
-from app.adapters.youtube_adapter import fetch_transcript
 from app.models.transcript import Sentence
-from app.errors import AppError
 from app.adapters.audio_adapter import download_audio
 from app.adapters.whisper_adapter import transcribe_audio
-import re
+
+import time
+
 
 def build_sentences(video_id: str) -> list[Sentence]:
+    audio_path = download_audio(video_id)
+
     try:
-        transcript = fetch_transcript(video_id)
+        whisper_result = transcribe_audio(audio_path)
 
-    except AppError as error:
-        if error.code not in {
-            "TRANSCRIPT_DISABLED",
-            "TRANSCRIPT_NOT_FOUND",
-        }:
-            raise
+        sentences = build_sentences_from_whisper(whisper_result)
 
-        audio_path = download_audio(video_id)
+        return sentences
 
-        try:
-            whisper_result = transcribe_audio(audio_path)
-            return build_sentences_from_whisper(whisper_result)
-
-        finally:
-            audio_path.unlink(missing_ok=True)
-
-
-    sentences = []
-
-    for item in transcript:
-        sentence = Sentence(
-            text=item["text"],
-            start=item["start"],
-            duration=item["duration"],
-            word_count=len(item["text"].split()),
-        )
-
-        sentences.append(sentence)
-
-    return sentences
-
-def build_text_sentences_from_youtube(transcript: list[dict]) -> list[str]:
-    full_text = ""
-
-    for item in transcript:
-        full_text += " " + item["text"]
-
-    full_text = full_text.strip()
-
-    return re.split(r"(?<=[.!?])\s+", full_text)
+    finally:
+        audio_path.unlink(missing_ok=True)
 
 def build_sentences_from_whisper(result: dict) -> list[Sentence]:
     sentences = []

@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 
 from app.schemas.session import (
     CreateSessionRequest,
@@ -6,19 +7,20 @@ from app.schemas.session import (
     SentenceInfo,
     CheckAnswerRequest,
     CheckAnswerResponse,
-    ShowAnswerResponse
+    ShowAnswerResponse,
 )
+
 from app.services import session_service
 
 
 router = APIRouter()
 
-#
+
 @router.post(
-    "/sessions",
-    response_model=CreateSessionResponse,
+    "/sessions"
 )
 def create_dictation_session(request: CreateSessionRequest):
+
     session_id, session = session_service.create_dictation_session(request.url)
 
     sentence_infos = []
@@ -33,13 +35,17 @@ def create_dictation_session(request: CreateSessionRequest):
             )
         )
 
-    return CreateSessionResponse(
+    response = CreateSessionResponse(
         session_id=session_id,
         video_id=session.video_id,
         sentences=sentence_infos,
     )
 
-# Check answer
+    json_content = response.model_dump(mode="json")
+
+    return JSONResponse(content=json_content)
+
+
 @router.post(
     "/sessions/{session_id}/check",
     response_model=CheckAnswerResponse,
@@ -55,15 +61,12 @@ def check_answer(session_id: str, request: CheckAnswerRequest):
         correct=correct,
     )
 
-# Show answer
+
 @router.get(
     "/sessions/{session_id}/sentences/{sentence_id}/answer",
     response_model=ShowAnswerResponse,
 )
-def get_answer(
-    session_id: str,
-    sentence_id: int,
-):
+def get_answer(session_id: str, sentence_id: int):
     answer = session_service.get_answer(
         session_id=session_id,
         sentence_id=sentence_id,

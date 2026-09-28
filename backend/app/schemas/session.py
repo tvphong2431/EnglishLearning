@@ -1,9 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 # Send for frontend
 
 class CreateSessionRequest(BaseModel):
     url: str
+
+    @field_validator("url")
+    @classmethod
+    def validate_url(cls, value: str):
+        if not value.strip():
+            raise ValueError("URL cannot be empty")
+
+        return value.strip()
 
 class SentenceInfo(BaseModel): 
     id: int
